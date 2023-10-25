@@ -1,0 +1,104 @@
+
+#container {
+	position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+}
+#video-container {
+	background-color: #f2f2f2;
+	text-align: center;
+	height: 100vh;
+	
+}
+
+#image-viewer {
+	position: relative !important;
+	object-fit: none;
+	cursor: pointer;
+}
+.fitNone {
+	object-fit: none;
+}
+.fitContain {
+	overflow: hidden;
+	object-fit: contain;
+	width: 100%;
+	height: 100%;
+}
+video {
+	cursor:pointer;
+	width: 100%;
+	height: 100%;
+}
+.button {
+	width: 3vw;
+	height: 3vw;
+}
+.video-container.normal {
+	position: relative;
+	display: inline-flex;
+  	align-items: center;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-content: space-around;
+}
+.video-controls.normal {
+	position: relative;
+	display: inline-flex;
+	opacity: 1;
+	background-color: #f2f2f2;
+	width: 100vw;
+	margin: 0px;
+	padding: 0px;
+	
+}
+/* フルスクリーン時のスタイル */
+.video-container.fullscreen {
+	position: relative;
+	opacity: 1;
+	bottom: 0;
+	background-color: #f2f2f2;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+.video-controls.fullscreen {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	background-color: #f2f2f2;
+}
+.video-container {
+	position: relative;
+	margin: 0px;
+	padding: 0px;
+	object-fit: contain;
+	
+}
+
+.video-controls {
+	position: relative;
+	opacity: 1;
+	bottom: 0;
+	background-color: #f2f2f2;
+	width: 100%;
+	margin: 0px;
+	height: 2.5rem;
+	min-height: 2.5rem;
+	padding-bottom: 0.5rem;
+	padding-top: 0.5rem;
+}
+.fixed-controls {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.7); /* 背景色を少し透明に */
+	z-index: 1000; /* 他の要素より前面に */
+  }

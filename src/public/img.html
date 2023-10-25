@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8">.
+	<style>
+		
+		* {
+			padding :0px;
+			margin : 0px;
+			box-shadow: none !important;
+			-webkit-user-select: none !important; /* Safari, Chrome, Opera */
+			-moz-user-select: none !important; /* Firefox */
+			-ms-user-select: none !important; /* Internet Explorer/Edge */
+			user-select: none !important; /* 標準のプロパティ */
+		}
+		html, body {
+			width: 100%;
+			height: 100%;
+			display: flex;
+		}
+		#container {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			overflow: hidden; /* 画像がウィンドウを超える場合はスクロールバーを表示 */
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		#video-container {
+			padding: 20px;
+			background-color: #f2f2f2;
+			text-align: center;
+		}
+		
+		
+		.fitNone {
+			object-fit: none;
+		}
+		.fitContain {
+			overflow: hidden;
+			object-fit: contain;
+			width: 100%;
+			height: 100%;
+		}
+		
+	</style>
+	<style type="text/css" media="screen" ></style>
+	<script type="application/javascript" src="src/dragscroll.js"></script>
+	<script type="application/javascript" src="src/img.js"></script>
+    <!-- react-playerのローカルリンク -->
+    <link rel="stylesheet" href="src\cdn.plyr.io_3.6.8_plyr.css"></link>
+    <script type="application/javascript" src="src\cdn.plyr.io_3.6.8_plyr.js"></script>
+	<title>Image Viewer</title>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const video = document.getElementById('video-container');
+			const url = ''
+			const player = new Plyr('#video-container');
+			player.media.id = 'video-container';
+			window.__TAURI__.event.emit('img-window-ready', { cmd: 'send', payload: 'prev_img' }); 
+			window.__TAURI__.event.listen('load-image', event => {
+				console.log('load-image',event);
+				const imgPath = event.payload.imgPath;
+				
+				load_image(imgPath);
+			});
+
+			// メタデータが読み込まれた後にサイズを取得
+			video.addEventListener('loadedmetadata', function() {
+				const width = this.videoWidth;
+				const height = this.videoHeight;
+
+				video.width = width;
+				video.height = height;
+			});
+			mousedragscrollable('#container');
+			
+			document.getElementById('w2').addEventListener("contextmenu", async (e) => {
+				e.preventDefault();
+			});
+			document.getElementById('image-viewer').addEventListener("contextmenu", async (e) => {
+				e.preventDefault();
+				window.__TAURI__.invoke("plugin:context_menu|show_context_menu", { items:[] });
+				await document.show_context_dir();
+				return false;
+				
+			});
+		});
+		
+	</script>
+
+</head>
+<body id="w2">
+	<div id="container">
+		<img id="image-viewer" src="" alt="Image Viewer" hidden />
+		<div id="video-container" hidden>
+			<video id="video-player" controls playsinline />
+		</div>
+	</div>
+
+
+	<script>
+		const movie_type = ["mp4", "mkv", "avi", "mov"];
+		const container = document.getElementById('image-container');
+		let img = localStorage.getItem('imgPath');
+		
+		function load_image (imgPath) {
+			console.log('load-image',imgPath);
+			let ext = imgPath.split('.').pop();
+			if (movie_type.includes(ext) ){
+				document.getElementById('image-viewer').setAttribute('hidden', '');
+				document.getElementById('video-container').removeAttribute('hidden');
+				document.getElementById('video-player').src = imgPath; 
+				window.playPlayer(imgPath);
+				document.getElementById('image-viewer').src = ""; 
+			} else {
+				document.getElementById('video-container').setAttribute('hidden', '');
+				document.getElementById('image-viewer').removeAttribute('hidden');
+				document.getElementById('image-viewer').src = imgPath; // 画像のsrcをセット
+				document.getElementById('video-player').src = ''; // 画像のsrcをセット
+			}
+			localStorage.setItem('imgPath', imgPath);
+			window.scrollTo({
+			top: 0,
+			behavior: 'smooth' // オプションでスムーズなスクロールを有効にすることができます
+			});
+		}
+	</script>
+		
+</body>
+</html>

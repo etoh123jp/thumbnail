@@ -1,0 +1,16 @@
+
+
+  .thumb-container {
+	display: flex;
+	overflow: hidden;
+  }
+  .FGrid {
+	overflow-x: hidden !important;
+	width: 100%;
+	height: 100%;
+	background-color: whitesmoke;
+	margin: 0 0 0 auto;
+  }
+.FGrid > div {
+	overflow: hidden;
+}

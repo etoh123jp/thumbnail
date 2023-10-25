@@ -1,0 +1,18 @@
+
+
+.menuButton {
+	margin-right: 16px;
+}
+
+.title {
+	flexGrow: 1;
+}
+
+.rightIcons {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+}
+select:focus {
+    outline: white 1px solid;
+}

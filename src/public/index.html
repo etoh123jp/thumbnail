@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri + React</title>
+	<style>
+		#root, body, html {
+			height: 100%;
+			width: 100%;
+		}
+		.gutter { 
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  flex: none;
+}
+ 
+.split-view {
+  display: flex;
+}
+ 
+.split-view.vertical {
+  flex-direction: column;
+}
+ 
+.split-view.horizontal {
+  flex-direction: row;
+}
+ 
+.split-view>*:not(.gutter){
+  flex-grow: 1;
+  overflow: auto;
+}
+ 
+.split-view>.gutter {
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+ 
+.split-view.horizontal>.gutter {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+  cursor: col-resize;
+  width: 10px;
+}
+ 
+.split-view.vertical>.gutter {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+  cursor: row-resize;
+  height: 10px;
+}
+	</style>
+
+	</head>
+
+	<body oncontextmenu="return false;">
+		
+		<div id="root">
+
+		</div>
+		<script type="module" src="./src/SplitView.js"></script>
+		<script type="module" src="./src/dragscroll.js"></script>
+		<script type="module" src="./src/main.jsx"></script>
+		<script type="module" src="./App.css"></script>
+
+		
+		  <script>
+			// 親要素にイベントリスナーを追加
+			document.body.addEventListener('wheel', function(event) {
+				event.stopPropagation();
+				console.log('wheel', event);
+			});
+		
+		</script>
+		</body>
+</html>

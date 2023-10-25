@@ -1,0 +1,18 @@
+.gridCell > * {
+	object-fit: contain;
+    width: 100%;
+    height: 100%;
+	box-sizing: border-box;
+}
+.gridCell {
+    width: 100%;
+    height: 100%;
+	padding: 3px;
+	box-sizing: border-box;
+}
+.gridCell:hover {
+	background-color: rgb(190, 190, 190);
+}
+video {
+	pointer-events: none;
+}

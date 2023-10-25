@@ -1,0 +1,47 @@
+
+  .DList {
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
+	width: 100%;
+	height: 100% !important;
+	border: 1px solid #e0e0e0;
+	background-color: whitesmoke;
+	margin:auto;
+  }
+
+#dir-list-container {
+	display: grid;
+}
+.MuiListItem-root > div {
+	overflow: hidden;
+	border-bottom: solid 1px #e0e0e0;
+}
+.MuiListItem-root  > *:hover {
+	background-color: rgb(190, 190, 190);
+	cursor : pointer !important;
+}
+.folder-icon-div {
+	width: 24px;
+	height: 24px;
+	min-width: 24px;
+	min-height: 24px;
+}
+#dir-name {
+	padding-left: 10px;
+}
+#dir-list-container {
+	overflow-y:auto;
+    position: relative;
+}
+.overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.8);
+	z-index: 9999;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
