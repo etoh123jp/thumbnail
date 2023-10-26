@@ -42,9 +42,15 @@
 		},
 		"path": {
 		  "all": true
+		  
 		},
 		"fs": {
-		  "all":  true
+		  "all":  true,
+      "readFile": true,
+      "writeFile": true,
+      "readDir": true,
+      "exists": true,
+      "scope": ["**"]
 	  },
 	  "dialog": {
 		  "all": true,

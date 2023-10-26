@@ -11,6 +11,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { TauriEvent } from "@tauri-apps/api/event"
 import { event, invoke } from '@tauri-apps/api';
 
+import AppConfig from "./AppConfig";
 let instance;
 
 class TauriBridge {
@@ -18,49 +19,55 @@ class TauriBridge {
 	constructor() {
 		if (TauriBridge.instance) {
 			throw new Error("You can only create one instance!");
+		} else {
+			instance = this;
+			this.App = null;
+			this.Grid = null;
+			this.dirList = null;
+			this.dense = null;
+			this.thumb_setting = {};
+			this.dirData = null;
+			this.storageDirectory = null;
+			this.imgWindow = null;
+			this.view_page_index = 0;
+			this.history = []; // 履歴リストを保存するための配列
+			this.historyIndex = -1; // 現在の履歴のインデックス
+			this.in_history_action = false; // 履歴アクション中のフラグ
+			// load setting
+			this.getThumbSettingSync();
+			instance = this;
+			document.addEventListener('mousedown', (event) => {
+				let p = null;
+				this.in_history_action = true;
+				if (event.button === 3) { // 戻るボタン
+					p = this.goBack();
+				} else if (event.button === 4) { // 進むボタン
+					p = this.goForward();
+				}
+				if (p) {
+					p.then(() => {
+						this.in_history_action = false;
+					})
+					.catch(error => {
+						this.in_history_action = false;
+						
+					});
+				} else {
+					this.in_history_action = false;
+				}
+			});
+			// localStorageから'favorites'キーで保存された配列を取得
+			const favoritesFromStorage = localStorage.getItem('favorites');
+
+			// JSON形式の文字列をJavaScriptの配列に変換
+			const favoritesArray = favoritesFromStorage != 'undefined' && favoritesFromStorage != null ? JSON.parse(favoritesFromStorage) : [];
+
+			this.favorites = favoritesArray;
+
+			TauriBridge.instance = instance;
+
 		}
-		instance = this;
-		TauriBridge.instance = instance;
-		this.App = null;
-		this.Grid = null;
-		this.dirList = null;
-		this.dense = null;
-		this.thumb_rect = this.getThumbRect();
-		this.dirData = null;
-		this.storageDirectory = null;
-		this.imgWindow = null;
-		this.view_page_index = 0;
-		this.history = []; // 履歴リストを保存するための配列
-		this.historyIndex = -1; // 現在の履歴のインデックス
-		this.in_history_action = false; // 履歴アクション中のフラグ
-		instance = this;
-		document.addEventListener('mousedown', (event) => {
-			let p = null;
-			this.in_history_action = true;
-			if (event.button === 3) { // 戻るボタン
-				p = this.goBack();
-			} else if (event.button === 4) { // 進むボタン
-				p = this.goForward();
-			}
-			if (p) {
-				p.then(() => {
-					this.in_history_action = false;
-				})
-				.catch(error => {
-					this.in_history_action = false;
-					
-				});
-			} else {
-				this.in_history_action = false;
-			}
-		});
-		// localStorageから'favorites'キーで保存された配列を取得
-		const favoritesFromStorage = localStorage.getItem('favorites');
-
-		// JSON形式の文字列をJavaScriptの配列に変換
-		const favoritesArray = favoritesFromStorage != 'undefined' && favoritesFromStorage != null ? JSON.parse(favoritesFromStorage) : [];
-
-		this.favorites = favoritesArray;
+		
 	}
 	// #region Page
 	/**
@@ -116,35 +123,43 @@ class TauriBridge {
 	// #endregion
 	// #region  common
 	/**
-	 * Retrieves the saved thumbnail rectangle from localStorage.
-	 * If no rectangle is found, it returns a default rectangle with width and height set to 200.
+	 * Retrieves the thumbnail setting from the local storage.
 	 *
-	 * @return {Object} The saved thumbnail rectangle.
+	 * @return {string|object} The value of the "thumbnail_setting" key in the local storage.
 	 */
-	getThumbRect() {
-		try {
-			const savedRect = localStorage.getItem("thumb_rect");
-			return savedRect ? JSON.parse(savedRect.replace(/^"|"$/g, '')) : { width: 200, height: 200 };
-		} catch (error) {
-		console.error("localStorageエラー:thumb_rect", error);
-			return { width: 200, height: 200 };
+	async getThumbSettingSync() {
+		if (TauriBridge.instance) {
+			return this.thumb_setting;
 		}
+		console.log("getThumbSetting:: load config");
+		this.config = new AppConfig();
+		try {
+			const setting = await this.config.loadConfigFile();
+			// const setting = localStorage.getItem("thumbnail_setting");
+			if (setting)
+				return setting;
+			return {};
+		} catch (error) {
+			console.log(error);
+			return {};
+		}
+		
 	}
-
+	/**
+ * Saves the thumbnail setting to localStorage.
+ *
+ * @param {object} setting - The setting to be saved.
+ * @return {void}
+ */
+	saveThumbSetting(setting) {
+		localStorage.setItem("thumbnail_setting", JSON.stringify(setting));
+	}
 	/**
 	 * Sets the thumb rectangle.
 	 *
 	 * @param {Object} rect - The rectangle to set as the thumb rectangle.
 	 */
-	async setThumbRect(rect) {
-		try {
-			this.thumb_rect = Object.assign({}, this.thumb_rect,  rect);
-			localStorage.setItem("thumb_rect", JSON.stringify(this.thumb_rect));
-			
-		} catch (error) {
-			console.error("localStorageエラー:", error);
-		}
-	}
+	
 	/**
 	 * Set the directory list.
 	 *

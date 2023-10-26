@@ -55,7 +55,8 @@ pub async fn main() -> Result<()>{
 			common_ops::get_user_home_dir,
 			common_ops::open_explorer_and_select,
 			read_archive,
-			send_index
+			send_index,
+			get_exe_directory
 			//imgmove
 		])
 		.plugin(tauri_plugin_context_menu::init())
@@ -64,6 +65,14 @@ pub async fn main() -> Result<()>{
 
 	Ok(())
 	
+}
+#[tauri::command]
+fn get_exe_directory() -> tauri::Result<String> {
+	let exe_path = env::current_exe()?;
+	let exe_dir = exe_path.parent().unwrap_or_else(|| {
+	  panic!("Could not determine the directory of the executable.");
+	});
+	Ok(exe_dir.to_str().unwrap().to_string())
 }
 #[tauri::command]
 async fn read_archive(path: String, task_manager: State<'_, Arc<Mutex<TaskManager>>>

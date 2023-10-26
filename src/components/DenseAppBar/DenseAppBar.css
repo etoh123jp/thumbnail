@@ -16,3 +16,6 @@
 select:focus {
     outline: white 1px solid;
 }
+div[role="combobox"] {
+	padding: 0.4em;
+  }

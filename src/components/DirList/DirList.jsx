@@ -1,6 +1,5 @@
 "use client"
 import React, { Component } from 'react';
-import TauriBridge from "@/utils/TauriBridge";
 import VirtualArray from "@/utils/VirtualArray";
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
@@ -16,6 +15,7 @@ import FolderZipIcon from '@mui/icons-material/FolderZip';
 import { Oval } from  'react-loader-spinner'
 import '@/public/src/SplitView.js';
 import './DirList.css';
+import TauriBridge from '@/utils/TauriBridge';
 
 class DirList extends Component {
 	constructor(props) {
@@ -29,14 +29,14 @@ class DirList extends Component {
 			header_height:0,
 			is_loading: false
 		};
-		this.tauriBridge = TauriBridge.getInstance();
-		this.tauriBridge.setDirList(this);
+		this.state.tb = TauriBridge.getInstance();
+		this.state.tb.setDirList(this);
 	}
 	selectDir=( item)=> {
 		if (item) {
 			const path = this.state.path + "\\" + item;
 			console.log(path);
-			this.tauriBridge.openFolder(path);
+			this.state.tb.openFolder(path);
 		} else {
 			let path = this.state.path;
 			const match = path.match(/[/\\]/g);
@@ -44,7 +44,7 @@ class DirList extends Component {
 				path = path.replace(/[/\\][^/\\]*$/, "");
 			}
 			console.log(path);
-			this.tauriBridge.openFolder(path);
+			this.state.tb.openFolder(path);
 		}
 	}
 	openExplorer() {
@@ -85,8 +85,11 @@ class DirList extends Component {
 	};
 	
 	render() {
+		if (this.state.tb == null || this.state.tb.config.configData == null) {
+			return [];
+		}
 		const {path, Va ,is_loading } = this.state;
-		const dirData = this.tauriBridge.getDirData();
+		const dirData = this.state.tb.getDirData();
 		if (!dirData || dirData.dirs.length === 0 && dirData.files.length === 0 ) {
 			return null;
 		}

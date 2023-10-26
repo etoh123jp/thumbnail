@@ -2,7 +2,8 @@
 "use client"
 import TauriBridge from "@/utils/TauriBridge";
 // import TauriBridge from "@/utils/TauriBridge";
-
+import CustomSlider from "./CustomSlider";
+import { Slider } from '@mui/material';
 
 import { Component } from "react";
 import { AppBar } from '@mui/material';
@@ -15,7 +16,6 @@ import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import PhotoSizeSelectLargeIcon from '@mui/icons-material/PhotoSizeSelectLarge';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Slider from '@mui/material/Slider';
 import Box from '@mui/material/Box';
 import FolderSpecialIcon from '@mui/icons-material/FolderSpecial';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -23,18 +23,30 @@ import FavoriteMenu from './FavoriteMenu'; // お気に入りメニューのコ�
 import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
 import TurnedInIcon from '@mui/icons-material/TurnedIn';
 import DriveSelect from './DriveSelect';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Select from '@mui/material/Select';
 import './DenseAppBar.css';
+
 class DenseAppBar extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			anchorEl: null, // メニューの位置
-			width: 50, // 幅の初期値
-			height: 50, // 高さの初期値
 			favorites: [],
 			drives: [],
 			favoriteAnchor:null,
 			tb: null,
+			thumb_setting: {
+				aspectRatioEnabled: true,
+				aspectRatio: 1,
+				rect : {
+					width: 240,
+					height: 240
+				},
+				min: 240,
+
+			}
 		};
 	}
 	async componentDidMount() {
@@ -42,9 +54,14 @@ class DenseAppBar extends Component {
 		tb.setDense(this);
 		const drives = await tb.getDrives();
 		const favorites = tb.getFavorites();
-		const rect = tb.getThumbRect();
-		this.setState({ drives:drives, tb:tb, favorites: favorites, rect:rect });
-	
+		var thumb_setting = await tb.getThumbSettingSync();
+		this.setState({ drives:drives, tb:tb, favorites: favorites});
+		if(localStorage.getItem("favorites")){
+			this.setState({favorites:JSON.parse(localStorage.getItem("favorites"))});
+		}
+		if(localStorage.getItem("thumbnail_setting")){
+			this.setState({thumb_setting:JSON.parse(localStorage.getItem("thumbnail_setting"))});
+		}
 	}
 	// フォルダ選択ダイアログを表示する関数
 	openFolderDialog = async () => {
@@ -59,20 +76,41 @@ class DenseAppBar extends Component {
 	// メニューを閉じる
 	handleClose = () => {
 		this.setState({ anchorEl: null });
-		this.state.tb.setThumbRect({ width: this.state.width, height: this.state.height });
+		
 	};
 
 	// 幅を変更する
 	handleWidthChange = (event, newValue) => {
-		this.setState({ width: newValue });
-		this.props.onSizeChange({ width: newValue, height: this.state.height });
+		if (newValue < this.state.thumb_setting.min) {
+			newValue = this.state.thumb_setting.min;
+		}
+		this.setState(prevState => ({
+			thumb_setting: {
+				...prevState.thumb_setting,
+				rec: {
+					...prevState.thumb_setting.rec,
+					width: newValue
+				}
+			}
+		}));
 	};
 
 	// 高さを変更する
 	handleHeightChange = (event, newValue) => {
-		this.setState({ height: newValue });
-		this.props.onSizeChange({ width: this.state.width, height: newValue });
+		if (newValue < this.state.thumb_setting.min) {
+			newValue = this.state.thumb_setting.min;
+		}
+		this.setState(prevState => ({
+			thumb_setting: {
+				...prevState.thumb_setting,
+				rec: {
+					...prevState.thumb_setting.rec,
+					height: newValue
+				}
+			}
+		}));
 	};
+
 		// 現在のフォルダをお気に入りに追加または削除
 	addToOrRemoveFromFavorite = () => {
 		const currentFolder = this.state.tb.getCurrentFolder(); // 現在のフォルダ名を取得
@@ -95,6 +133,7 @@ class DenseAppBar extends Component {
 			return { favorites: newFavorites };
 		});
 	};
+
 	handleDeleteFavorite = (folder) => {
 		this.setState(prevState => {
 			const newFavorites = prevState.favorites.filter(fav => fav !== folder);
@@ -105,6 +144,9 @@ class DenseAppBar extends Component {
 			return { favorites: newFavorites };
 		});
 	};
+	handleAspectRatioChange = () => {
+		localStorage.setItem('thumbnail_setting', JSON.stringify({ ...this.state.thumb_setting, aspectRatioEnabled: !this.state.thumb_setting.aspectRatioEnabled }));
+	}
 	handleFavoriteClick = (event) => {
 		this.setState({ favoriteAnchor: event.currentTarget });
 	};
@@ -118,10 +160,13 @@ class DenseAppBar extends Component {
 		this.state.tb.openFolder(drive);
 	}
 	render ()  { 
-		if (this.state.tb == null) {
+		if (this.state.tb == null || this.state.tb.config.configData == null) {
 			return [];
 		}
 		const { anchorEl, width, height, favorites,  favoriteAnchor } = this.state;
+		const { rect ,aspectRatioEnabled, aspectRatio } = this.state.thumb_setting;
+		const minSize = this.state.thumb_setting.min;
+		console.log(this.state.thumb_setting);
 		const currentFolder = this.state.tb.getCurrentFolder();
 			// 現在のフォルダがお気に入りに含まれているか確認
 		const isFavorite = favorites.includes(currentFolder);
@@ -143,23 +188,22 @@ class DenseAppBar extends Component {
 				style={{borderColor:'white' }}
 			/>
 				<IconButton
-						style={{ marginRight: 1 }} 
+					style={{ marginRight: 1 }} 
 
-							edge="end"
-							color="inherit"
-							aria-label="add-to-favorite"
-							onClick={this.addToOrRemoveFromFavorite}
-						>
-							{isFavorite ? <TurnedInIcon /> : <TurnedInNotIcon />}
-						</IconButton>
+						edge="end"
+						color="inherit"
+						aria-label="add-to-favorite"
+						onClick={this.addToOrRemoveFromFavorite}
+					>
+						{isFavorite ? <TurnedInIcon /> : <TurnedInNotIcon />}
+				</IconButton>
 
-						{/* 現在のフォルダ名を表示 */}
-						<Typography variant="h6" color="inherit" style={{whiteSpace: 'nowrap', width: '100%'}}>
-							{currentFolder}
-						</Typography>
+				{/* 現在のフォルダ名を表示 */}
+				<Typography variant="h6" color="inherit" style={{whiteSpace: 'nowrap', width: '100%'}}>
+					{currentFolder}
+				</Typography>
 				<div className="rightIcons">
-			
-				<IconButton
+					<IconButton
 						edge="start"
 						color="inherit"
 						aria-label="favorite"
@@ -175,8 +219,8 @@ class DenseAppBar extends Component {
 						favorites={favorites}
 						handleDelete={this.handleDeleteFavorite}  // 削除処理のメソッドを渡す
 					/>
-              
-				<IconButton  color="inherit" onClick={this.handleClick}>
+			
+					<IconButton  color="inherit" onClick={this.handleClick}>
 						<PhotoSizeSelectLargeIcon />
 					</IconButton>
 					<Menu
@@ -186,20 +230,40 @@ class DenseAppBar extends Component {
 						
 						onClose={this.handleClose}
 					>
-							<MenuItem style={{ width: '300px', height: '150px' }}>
-							<Box display="flex" flexDirection="column" alignItems="left" style={{ width: '100%' , fontSize:'medium'}}>
-								<Typography gutterBottom>高さ：{height} px</Typography>
+							<MenuItem style={{ width: '300px' }}>
+								<Box display="flex" flexDirection="column" alignItems="left" style={{ width: '100%' , fontSize:'medium'}}>
+								<Box display="flex" flexDirection="row" alignItems="center" style={{ width: '100%' , fontSize:'medium'}}>
+									<Typography gutterBottom>アスペクト比</Typography>
+									<Checkbox
+										checked={this.state.thumb_setting.aspectRatioEnabled}
+										onChange={this.handleAspectRatioChange}
+										name="aspectRatioEnabled"
+									/>
+									<Select
+										labelId="aspect-ratio-select-label"
+										id="aspect-ratio-select"
+										value={this.state.thumb_setting.aspectRatio}
+										onChange={this.handleAspectRatioSelectChange}
+										style={{padding:'0px'}}
+									>
+										<MenuItem value={1}>1:1</MenuItem>
+										<MenuItem value={1.5}>3:2</MenuItem>
+										<MenuItem value={1.777}>16:9</MenuItem>
+									</Select>
+								</Box>
+
+								<Typography gutterBottom>高さ：{rect.height} px</Typography>
 								<Slider
-									value={height}
-									min={0}
+									value={rect.height}
+									min={minSize}
 									max={window.screen.height}
 									onChange={this.handleHeightChange}
 									style={{ width: '100%' }}
 								/>
-								<Typography gutterBottom>幅：{width} px</Typography>
+								<Typography gutterBottom>幅：{rect.width} px</Typography>
 								<Slider
-									value={width}
-									min={0}
+									value={rect.width}
+									min={minSize}
 									max={window.screen.width}
 									onChange={this.handleWidthChange}
 									style={{ width: '100%' }}
@@ -207,17 +271,17 @@ class DenseAppBar extends Component {
 							</Box>
 						</MenuItem>
 					</Menu>
-				<IconButton
-					edge="end"
-					color="inherit"
-					aria-label="folder"
-					onClick={this.openFolderDialog}
-				>
-					<FolderOpenIcon />
-				</IconButton>
-				<IconButton edge="end" color="inherit" aria-label="more">
-					<MoreIcon />
-				</IconButton>
+					<IconButton
+						edge="end"
+						color="inherit"
+						aria-label="folder"
+						onClick={this.openFolderDialog}
+					>
+						<FolderOpenIcon />
+					</IconButton>
+					<IconButton edge="end" color="inherit" aria-label="more">
+						<MoreIcon />
+					</IconButton>
 				</div>
 			</Toolbar>
 			</AppBar>
