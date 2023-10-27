@@ -128,7 +128,7 @@ class TauriBridge {
 	 * @return {string|object} The value of the "thumbnail_setting" key in the local storage.
 	 */
 	async getThumbSettingSync() {
-		if (TauriBridge.instance) {
+		if (TauriBridge.instance && this.config != null && this.config.configData != null) {
 			return this.thumb_setting;
 		}
 		console.log("getThumbSetting:: load config");
@@ -137,7 +137,7 @@ class TauriBridge {
 			const setting = await this.config.loadConfigFile();
 			// const setting = localStorage.getItem("thumbnail_setting");
 			if (setting)
-				return setting;
+				return setting.thumb_setting;
 			return {};
 		} catch (error) {
 			console.log(error);

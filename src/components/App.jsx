@@ -15,19 +15,20 @@ class App extends Component {
 		super(props);
 		this.state = {
 			
-			btc: null,
+			tb: null,
 		};
 		
 		this.gridRef = React.createRef();
 		this.dirRef = React.createRef();
 	}
 
-	componentDidMount() {
-		
+	async componentDidMount() {
+		const tb = TauriBridge.getInstance(); 
+		await tb.getThumbSettingSync();
 		SplitView.activate(document.getElementById("mainContainer"));
 		
 		this.setState({
-			btc: TauriBridge.getInstance(),
+			tb: TauriBridge.getInstance(),
 		});
 		TauriBridge.getInstance().setApp(this);
 		window.addEventListener("resize", this.handleResize);
@@ -36,9 +37,9 @@ class App extends Component {
 		// スタイルから％の数値を読み取る（この例では簡単のため、ステートを直接使用）
 	}
 
-	componentWillUnmount() {
+	 componentWillUnmount() {
 		window.removeEventListener("resize", this.handleResize);
-	}
+	} 
 
 	handleResize = () => {
 		this.setState({
@@ -50,10 +51,7 @@ class App extends Component {
 	};
 
 	render() {
-		const { tumb_rect } = this.state;
-		const dynamicStyle = {
-			width: `calc(${this.state.percentage}% - 5px)`
-		};
+		
 		return (
 			<div className="App">
 				<div id="header" className="header">

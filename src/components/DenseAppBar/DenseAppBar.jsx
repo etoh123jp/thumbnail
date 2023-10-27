@@ -2,8 +2,7 @@
 "use client"
 import TauriBridge from "@/utils/TauriBridge";
 // import TauriBridge from "@/utils/TauriBridge";
-// import CustomSlider from "./CustomSlider";
-import { Slider } from '@mui/material';
+import CustomSlider from "./CustomSlider";
 
 import { Component } from "react";
 import { AppBar } from '@mui/material';
@@ -37,32 +36,27 @@ class DenseAppBar extends Component {
 			drives: [],
 			favoriteAnchor:null,
 			tb: null,
-			thumb_setting: {
-				aspectRatioEnabled: true,
-				aspectRatio: 1,
-				rect : {
-					width: 240,
-					height: 240
-				},
-				min: 240,
-
-			}
+			thumb_setting: null
 		};
+		this.handleHeightChange = this.handleHeightChange.bind(this);
 	}
 	async componentDidMount() {
-		const tb = TauriBridge.getInstance();
+		const tb = TauriBridge.getInstance(); 
 		tb.setDense(this);
 		const drives = await tb.getDrives();
 		const favorites = tb.getFavorites();
 		var thumb_setting = await tb.getThumbSettingSync();
-		this.setState({ drives:drives, tb:tb, favorites: favorites});
-		if(localStorage.getItem("favorites")){
-			this.setState({favorites:JSON.parse(localStorage.getItem("favorites"))});
+		if (thumb_setting == null) {
+			thumb_setting = {
+				rect: { 
+					width: 200,
+					height: 200
+				}
+			};
 		}
-		if(localStorage.getItem("thumbnail_setting")){
-			this.setState({thumb_setting:JSON.parse(localStorage.getItem("thumbnail_setting"))});
-		}
-	}
+		this.setState({ drives:drives, tb:tb, favorites: favorites,thumb_setting:thumb_setting});
+		console.log("componentDidMount::thumb_setting::",this.state.thumb_setting);
+	} 
 	// フォルダ選択ダイアログを表示する関数
 	openFolderDialog = async () => {
 		const tb = TauriBridge.getInstance();
@@ -84,11 +78,12 @@ class DenseAppBar extends Component {
 		if (newValue < this.state.thumb_setting.min) {
 			newValue = this.state.thumb_setting.min;
 		}
+		const thumb_setting = this.state.thumb_setting;
 		this.setState(prevState => ({
 			thumb_setting: {
 				...this.state.thumb_setting,
-				rec: {
-					...this.state.thumb_setting.rec,
+				rect: {
+					...this.state.thumb_setting.rect,
 					width: newValue
 				}
 			}
@@ -98,21 +93,16 @@ class DenseAppBar extends Component {
 	// 高さを変更する
 	handleHeightChange = (event, newValue) => {
 		const { thumb_setting } = this.state;
-		if (newValue < thumb_setting.min) {
-		  newValue = thumb_setting.min;
-		}
-		if (thumb_setting.rect.height !== newValue) {
-		  this.setState(prevState => ({
+		this.setState(prevState => ({
 			thumb_setting: {
-			  ...prevState.thumb_setting,
-			  rec: {
-				...prevState.thumb_setting.rec,
+			...prevState.thumb_setting,
+			rect: {
+				...prevState.thumb_setting.rect,
 				height: newValue
-			  }
 			}
-		  }));
-		}
-	  };
+			}
+		}));
+	};
 	  
 		// 現在のフォルダをお気に入りに追加または削除
 	addToOrRemoveFromFavorite = () => {
@@ -163,11 +153,11 @@ class DenseAppBar extends Component {
 		this.state.tb.openFolder(drive);
 	}
 	render ()  { 
-		if (this.state.tb == null || this.state.tb.config.configData == null) {
+		if (this.state.tb == null || this.state.thumb_setting == null || this.state.thumb_setting.rect == null) {
 			return [];
 		}
 		const { anchorEl,  favorites,  favoriteAnchor } = this.state;
-		const { rect ,aspectRatioEnabled, aspectRatio } = this.state.thumb_setting;
+		const { rect ,aspectRatioEnabled, aspectRatio, min } = this.state.thumb_setting;
 		const {height, width} = rect;
 		const minSize = this.state.thumb_setting.min;
 		const currentFolder = this.state.tb.getCurrentFolder();
@@ -255,8 +245,8 @@ class DenseAppBar extends Component {
 									</Select>
 								</Box>
 
-								<Typography gutterBottom>高さ：{height} px</Typography>
-								<Slider
+								<Typography gutterBottom>高さ：{height} px</Typography> 
+								<CustomSlider
 									value={height}
 									min={minSize}
 									max={window.screen.height}
@@ -264,7 +254,7 @@ class DenseAppBar extends Component {
 									style={{ width: '100%' }}
 								/>
 								<Typography gutterBottom>幅：{width} px</Typography>
-								<Slider
+								<CustomSlider
 									value={width}
 									min={minSize}
 									max={window.screen.width}
