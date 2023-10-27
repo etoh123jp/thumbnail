@@ -17,8 +17,9 @@ function ValueLabelComponent(props) {
 export default function CustomSlider(props) {
   return (
     <Slider
-      ValueLabelComponent={ValueLabelComponent}
-      {...props}
+		valueLabelDisplay="auto"
+		ValueLabelComponent={ValueLabelComponent}
+		{...props}
     />
   );
 }
