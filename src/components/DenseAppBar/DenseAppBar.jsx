@@ -45,7 +45,7 @@ class DenseAppBar extends Component {
 		tb.setDense(this);
 		const drives = await tb.getDrives();
 		const favorites = tb.getFavorites();
-		var thumb_setting = await tb.getThumbSettingSync();
+		var thumb_setting = tb.getThumbnailSetting();
 		if (thumb_setting == null) {
 			thumb_setting = {
 				rect: { 

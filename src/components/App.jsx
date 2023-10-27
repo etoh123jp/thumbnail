@@ -16,32 +16,34 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			
+			init: false,
 			tb: null,
+			theme:null,
 		};
 		
 		this.gridRef = React.createRef();
 		this.dirRef = React.createRef();
 	}
 
-	async componentDidMount() {
+	async componentDidMount() { 
+		console.log('componentDidMount');
 		const tb = TauriBridge.getInstance(); 
-		tb.init().then((result) => {
+		await tb.init();
+		TauriBridge.getInstance().setApp(this);
+		TauriBridge.getInstance().getStorageDirectory();
+		const theme = tb.getTheme();
+
+		this.setState(state=>({
+			tb: tb,
+			init:true,
+			theme:theme
+		}));
+		const mainContainer= document.getElementById("mainContainer");
+		if (mainContainer) {
 			SplitView.activate(document.getElementById("mainContainer"));
-			TauriBridge.getInstance().setApp(this);
 			window.addEventListener("resize", this.handleResize);
-			TauriBridge.getInstance().getStorageDirectory();
-			const currentStyle = window.getComputedStyle(this.gridRef.current).width;
-			this.setState({
-				tb: tb,
-			});
-		}).catch((err) => {
-			console.log(err);
-		});
+		}
 		
-		
-		
-		// スタイルから％の数値を読み取る（この例では簡単のため、ステートを直接使用）
 	}
 
 	 componentWillUnmount() {
@@ -54,12 +56,13 @@ class App extends Component {
 				width: window.innerWidth,
 				height: window.innerHeight,
 			},
-		});
+		}); 
 	};
 
 	render() {
+		console.log('render');
 		if (this.state.tb == null) return [];
-		const theme = this.state.tb.getTheme();
+		const theme = createTheme(this.state.theme);
 		return (
 			<ThemeProvider theme={theme}>
 				<div className="App">

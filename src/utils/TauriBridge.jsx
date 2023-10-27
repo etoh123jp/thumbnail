@@ -73,11 +73,21 @@ class TauriBridge {
 	async init() {
 		await this.config.init();
 	}
+	/**
+	 * Retrieves the theme from the config data.
+	 *
+	 * @return {type} The theme value from the config data.
+	 */
 	getTheme() {
-		this.config.configData.theme;
+		return this.config.configData.theme;
 	}
+		/**
+	 * Retrieves the thumbnail setting from the configuration data.
+	 *
+	 * @return {type} The value of the thumbnail setting.
+	 */
 	getThumbnailSetting() {
-		return this.config.configData.thumbnail;
+		return this.config.configData.thumbnail.thumbnail;
 	}
 	// #region Page
 	/**

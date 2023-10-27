@@ -30,7 +30,7 @@ class ThumbList extends React.Component {
 		this.gridRef = document.getElementById("thumb-container");
 		const tb =  TauriBridge.getInstance();
 		tb.setGrid(this);
-		const thumb_setting =  await tb.getThumbSettingSync();
+		const thumb_setting =  tb.getThumbnailSetting();
 		this.setState({ thumb_setting: thumb_setting, tb:tb });
 		
 		window.SplitView.setUserDefinedCallback( (newSizeA, newSizeB, percent) => {
@@ -62,9 +62,9 @@ class ThumbList extends React.Component {
 		const gutter = document.getElementById("gutter");
 		const width = gridRef.clientWidth;
 		const height = gutter.clientHeight ;	
-		const config = this.state.tb.config.configData;
+		const thumb_setting = this.state.tb.getThumbnailSetting();
 
-		const tumb_rect = config.thumb_setting.rect;
+		const tumb_rect = thumb_setting.rect;
 		const columnCount = Math.floor( width / tumb_rect.width) || 1;
 		Va.setColumnCount(columnCount == 0 ? 1 : columnCount); // 列数をセット
 

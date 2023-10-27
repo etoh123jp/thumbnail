@@ -26,14 +26,17 @@ class AppConfig {
 		this.path.configData = configFilePath;
 		this.path.favorite =  favoritePath;
 		this.path.thumbnail = thumb_settingPath;
+		this.configData = {};
 		await this.load();
 	}
 	async load() {
 		await this.loadThemeSeeting();
 		await this.loadThumbnailSetting();
+		console.log('Config loaded:', this.configData);
 	}
 	async loadThemeSeeting() 
 	{
+		this.configData.theme = {};
 		await this.loadConfigFile("theme", 
 		{
 			theme:{
@@ -58,20 +61,19 @@ class AppConfig {
 		  });
 	}
 	async loadThumbnailSetting() {
-		
+		this.configData.thumbnail = {};
 		await this.loadConfigFile('thumbnail',
-			{
-				thumbnail: {
-					aspectRatioEnabled: true,
-					aspectRatio: 1,
-					rect : {
-						width: 240,
-						height: 240
-					},
-					min: 240,
-				}
+		{
+			thumbnail: {
+				aspectRatioEnabled: true,
+				aspectRatio: 1,
+				rect : {
+					width: 240,
+					height: 240
+				},
+				min: 240,
 			}
-		);
+		});
 	}
 	// 設定ファイルを読み込む
 	async loadConfigFile(fileName, defaultConfig={}) {
@@ -82,14 +84,14 @@ class AppConfig {
 			console.log("exists ",fileName, ".json5");
 			const configDataJson = await readTextFile( configFilePath);
 			const configData = JSON.parse(configDataJson);
-			this.configData = {...configData};
+			this.configData[fileName] = {...configData};
 			console.log('Config loaded:', this.configData[fileName]);
 		} else {
 			console.log("does not exists ",fileName,".json5");
 	
 			const configData = JSON.stringify(defaultConfig);
 			writeTextFile({ path: configFilePath, contents: configData }).then(() => {
-			this.configData = {...configData};
+				this.configData[fileName] = {...configData};
 				console.log('Config file created.');
 			}).catch(error => {
 				console.log(error);
@@ -97,9 +99,7 @@ class AppConfig {
 		}
 		return this.configData[fileName];
 	}
-	async loadThumbFile() {
-		
-	}
+	
 	// 設定ファイルを保存する
 	saveConfigFile() {
 		// データをJSON形式に変換して書き込む
