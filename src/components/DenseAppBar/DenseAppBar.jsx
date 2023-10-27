@@ -2,7 +2,7 @@
 "use client"
 import TauriBridge from "@/utils/TauriBridge";
 // import TauriBridge from "@/utils/TauriBridge";
-import CustomSlider from "./CustomSlider";
+// import CustomSlider from "./CustomSlider";
 import { Slider } from '@mui/material';
 
 import { Component } from "react";
@@ -86,9 +86,9 @@ class DenseAppBar extends Component {
 		}
 		this.setState(prevState => ({
 			thumb_setting: {
-				...prevState.thumb_setting,
+				...this.state.thumb_setting,
 				rec: {
-					...prevState.thumb_setting.rec,
+					...this.state.thumb_setting.rec,
 					width: newValue
 				}
 			}
@@ -97,20 +97,23 @@ class DenseAppBar extends Component {
 
 	// 高さを変更する
 	handleHeightChange = (event, newValue) => {
-		if (newValue < this.state.thumb_setting.min) {
-			newValue = this.state.thumb_setting.min;
+		const { thumb_setting } = this.state;
+		if (newValue < thumb_setting.min) {
+		  newValue = thumb_setting.min;
 		}
-		this.setState(prevState => ({
+		if (thumb_setting.rect.height !== newValue) {
+		  this.setState(prevState => ({
 			thumb_setting: {
-				...prevState.thumb_setting,
-				rec: {
-					...prevState.thumb_setting.rec,
-					height: newValue
-				}
+			  ...prevState.thumb_setting,
+			  rec: {
+				...prevState.thumb_setting.rec,
+				height: newValue
+			  }
 			}
-		}));
-	};
-
+		  }));
+		}
+	  };
+	  
 		// 現在のフォルダをお気に入りに追加または削除
 	addToOrRemoveFromFavorite = () => {
 		const currentFolder = this.state.tb.getCurrentFolder(); // 現在のフォルダ名を取得
@@ -163,10 +166,10 @@ class DenseAppBar extends Component {
 		if (this.state.tb == null || this.state.tb.config.configData == null) {
 			return [];
 		}
-		const { anchorEl, width, height, favorites,  favoriteAnchor } = this.state;
+		const { anchorEl,  favorites,  favoriteAnchor } = this.state;
 		const { rect ,aspectRatioEnabled, aspectRatio } = this.state.thumb_setting;
+		const {height, width} = rect;
 		const minSize = this.state.thumb_setting.min;
-		console.log(this.state.thumb_setting);
 		const currentFolder = this.state.tb.getCurrentFolder();
 			// 現在のフォルダがお気に入りに含まれているか確認
 		const isFavorite = favorites.includes(currentFolder);
@@ -252,17 +255,17 @@ class DenseAppBar extends Component {
 									</Select>
 								</Box>
 
-								<Typography gutterBottom>高さ：{rect.height} px</Typography>
+								<Typography gutterBottom>高さ：{height} px</Typography>
 								<Slider
-									value={rect.height}
+									value={height}
 									min={minSize}
 									max={window.screen.height}
 									onChange={this.handleHeightChange}
 									style={{ width: '100%' }}
 								/>
-								<Typography gutterBottom>幅：{rect.width} px</Typography>
+								<Typography gutterBottom>幅：{width} px</Typography>
 								<Slider
-									value={rect.width}
+									value={width}
 									min={minSize}
 									max={window.screen.width}
 									onChange={this.handleWidthChange}
