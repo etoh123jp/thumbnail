@@ -33,8 +33,9 @@ class TauriBridge {
 			this.history = []; // 履歴リストを保存するための配列
 			this.historyIndex = -1; // 現在の履歴のインデックス
 			this.in_history_action = false; // 履歴アクション中のフラグ
+			this.config = new AppConfig();
+
 			// load setting
-			this.getThumbSettingSync();
 			instance = this;
 			document.addEventListener('mousedown', (event) => {
 				let p = null;
@@ -68,6 +69,15 @@ class TauriBridge {
 
 		}
 		
+	}
+	async init() {
+		await this.config.init();
+	}
+	getTheme() {
+		this.config.configData.theme;
+	}
+	getThumbnailSetting() {
+		return this.config.configData.thumbnail;
 	}
 	// #region Page
 	/**
@@ -120,40 +130,7 @@ class TauriBridge {
 			return null; // 進む履歴がない場合
 		}
 	}
-	// #endregion
-	// #region  common
-	/**
-	 * Retrieves the thumbnail setting from the local storage.
-	 *
-	 * @return {string|object} The value of the "thumbnail_setting" key in the local storage.
-	 */
-	async getThumbSettingSync() {
-		if (TauriBridge.instance && this.config != null && this.config.configData != null) {
-			return this.thumb_setting;
-		}
-		console.log("getThumbSetting:: load config");
-		this.config = new AppConfig();
-		try {
-			const setting = await this.config.loadConfigFile();
-			// const setting = localStorage.getItem("thumbnail_setting");
-			if (setting)
-				return setting.thumb_setting;
-			return {};
-		} catch (error) {
-			console.log(error);
-			return {};
-		}
-		
-	}
-	/**
- * Saves the thumbnail setting to localStorage.
- *
- * @param {object} setting - The setting to be saved.
- * @return {void}
- */
-	saveThumbSetting(setting) {
-		localStorage.setItem("thumbnail_setting", JSON.stringify(setting));
-	}
+
 	/**
 	 * Sets the thumb rectangle.
 	 *

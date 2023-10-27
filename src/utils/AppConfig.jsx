@@ -15,21 +15,53 @@ class AppConfig {
 		
 		
 	}
-	// 設定ファイルを読み込む
-	async loadConfigFile() {
+	async init() {
+		this.path = {};
 		const BaseDirectory = await invoke('get_exe_directory');
 		const configFilePath = await path.join(BaseDirectory,'config.json5');
-
-		if (await fs.exists(configFilePath)) {
-			console.log("exists config.json5");
-			const configData = await readTextFile( configFilePath);
-			this.configData = JSON.parse(configData);
-			console.log('Config loaded:', this.configData);
-		} else {
-			console.log("does not exists config.json5");
-			// ファイルが存在しない場合、作成する
-			const defaultConfig = {
-				thumb_setting: {
+		const thumb_settingPath = await path.join(BaseDirectory,'thumbnail.json5');
+		const themeFilepath = await path.join(BaseDirectory,'theme.json5');
+		const favoritePath = await path.join(BaseDirectory,'favorite.json5');
+		this.path.base_dir = BaseDirectory;
+		this.path.configData = configFilePath;
+		this.path.favorite =  favoritePath;
+		this.path.thumbnail = thumb_settingPath;
+		await this.load();
+	}
+	async load() {
+		await this.loadThemeSeeting();
+		await this.loadThumbnailSetting();
+	}
+	async loadThemeSeeting() 
+	{
+		await this.loadConfigFile("theme", 
+		{
+			theme:{
+				typography: {
+					fontSize: 12,
+					fontWeightLight: 300,
+					fontWeightRegular: 400,
+					fontWeightMedium: 700,
+				
+					h1: { fontSize: 60 },
+					h2: { fontSize: 48 },
+					h3: { fontSize: 42 },
+					h4: { fontSize: 36 },
+					h5: { fontSize: 20 },
+					h6: { fontSize: 12 },
+					subtitle1: { fontSize: 13 },
+					body1: { fontSize: 14 },
+					button: { textTransform: 'none' },
+				},
+			}
+			
+		  });
+	}
+	async loadThumbnailSetting() {
+		
+		await this.loadConfigFile('thumbnail',
+			{
+				thumbnail: {
 					aspectRatioEnabled: true,
 					aspectRatio: 1,
 					rect : {
@@ -38,18 +70,36 @@ class AppConfig {
 					},
 					min: 240,
 				}
-			};
+			}
+		);
+	}
+	// 設定ファイルを読み込む
+	async loadConfigFile(fileName, defaultConfig={}) {
+		const BaseDirectory = await invoke('get_exe_directory');
+		const configFilePath = await path.join(BaseDirectory, fileName + '.json5');
+
+		if (await fs.exists(configFilePath)) {
+			console.log("exists ",fileName, ".json5");
+			const configDataJson = await readTextFile( configFilePath);
+			const configData = JSON.parse(configDataJson);
+			this.configData = {...configData};
+			console.log('Config loaded:', this.configData[fileName]);
+		} else {
+			console.log("does not exists ",fileName,".json5");
+	
 			const configData = JSON.stringify(defaultConfig);
 			writeTextFile({ path: configFilePath, contents: configData }).then(() => {
-				this.configData = defaultConfig;
+			this.configData = {...configData};
 				console.log('Config file created.');
 			}).catch(error => {
 				console.log(error);
 			});
 		}
-		return this.configData;
+		return this.configData[fileName];
 	}
-
+	async loadThumbFile() {
+		
+	}
 	// 設定ファイルを保存する
 	saveConfigFile() {
 		// データをJSON形式に変換して書き込む
@@ -67,7 +117,7 @@ class AppConfig {
 	 * @return {@type{aspectRatioEnabled: boolean, aspectRatio: number, rect: {width: number, height: number}, min: number}} The thumb setting value.
 	 */
 	getThumbSetting(){
-		return this.configData.thumb_setting;
+		return this.configData.thumbnail;
 	}
 	
 }

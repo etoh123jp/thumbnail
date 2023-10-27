@@ -191,8 +191,8 @@ class DenseAppBar extends Component {
 						{isFavorite ? <TurnedInIcon /> : <TurnedInNotIcon />}
 				</IconButton>
 
-				{/* 現在のフォルダ名を表示 */}
-				<Typography variant="h6" color="inherit" style={{whiteSpace: 'nowrap', width: '100%'}}>
+				{/* 現在のフォルダ名を表示 */} 
+				<Typography  color="inherit" style={{whiteSpace: 'nowrap', width: '100%'}}>
 					{currentFolder}
 				</Typography>
 				<div className="rightIcons">

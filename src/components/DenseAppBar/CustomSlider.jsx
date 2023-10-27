@@ -13,11 +13,26 @@ export default function CustomSlider(props) {
     setHoverValue(Math.round(value));
   };
 
+  const handleMouseLeave = () => {
+    setHoverValue(null);
+  };
+
+  const handleMouseUp = () => {
+    if (hoverValue !== null) {
+      // ここで hoverValue を使って何らかの更新処理を行う
+      console.log(`Mouse Up: ${hoverValue}`);
+    }
+  };
+
   return (
-    <div onMouseMove={handleMouseMove}>
+    <div 
+      onMouseMove={handleMouseMove} 
+      onMouseLeave={handleMouseLeave}
+      onMouseUp={handleMouseUp}  // ここに onMouseUp イベントを追加
+    >
       {hoverValue !== null && (
-        <Tooltip title={hoverValue} placement="top">
-          <span />
+        <Tooltip title={hoverValue.toString()} placement="top" open>
+          <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }} />
         </Tooltip>
       )}
       <Slider {...props} />
