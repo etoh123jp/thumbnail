@@ -93,6 +93,11 @@ class DirList extends Component {
 			return null;
 		}
 		const gridRef = document.getElementById("dir-list-container");
+		if (gridRef == null) {
+			console.log("gridRef == null");
+			return;
+		}
+
 		const gutter = document.getElementById("gutter");
 		const width = gridRef.clientWidth;
 		const height = gutter.clientHeight ; 

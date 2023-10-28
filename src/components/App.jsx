@@ -1,7 +1,6 @@
 "use client"
 
 import TauriBridge from "@/utils/TauriBridge";
-
 import React, { Component } from "react";
 import DenseAppBar from "@/components/DenseAppBar/DenseAppBar";
 import ThumbList from "@/components/ThumbList/ThumbList";
@@ -25,7 +24,7 @@ class App extends Component {
 	}
 
 	async componentDidMount() { 
-		console.log('componentDidMount');
+		console.log('App componentDidMount');
 		const tb = TauriBridge.getInstance(); 
 		await tb.init();
 		TauriBridge.getInstance().setApp(this);
@@ -38,17 +37,18 @@ class App extends Component {
 			theme:theme,
 			thumb_setting:thumb_setting 
 		}));
-		const contaier = this.mainContainerRef.current;
-		if (contaier) {
-			SplitView.activate(contaier);
-			window.addEventListener("resize", this.handleResize);
-		}
-		
+		window.addEventListener("resize", this.handleResize);
 	}
-
-	 componentWillUnmount() {
+	componentDidUpdate() 
+	{
+		console.log('App componentDidUpdate');
+		if (this.state.init) {
+			SplitView.activate(this.mainContainerRef.current);
+		}
+	}
+	componentWillUnmount() {
 		window.removeEventListener("resize", this.handleResize);
-	} 
+	}
 	changeThumbSize = (size) => {
 		this.setState(prevState => ({
 			thumb_setting: {
@@ -73,18 +73,19 @@ class App extends Component {
 		return (
 			<ThemeProvider theme={theme}>
 				<div className="App">
-					<div id="header" className="header">
-						<DenseAppBar changeThumbSize={this.changeThumbSize} />
-					</div>
-					<div id="mainContainer" ref={this.mainContainerRef} className="split-view horizontal">
-						<div ref={this.dirRef} id="dir-list-container" className="dir-list-container">
-							<DirList   />
+						<div id="header" className="header">
+							<DenseAppBar changeThumbSize={this.changeThumbSize} />
 						</div>
-						<div id="gutter" className="gutter"></div>
-						<div ref={this.gridRef} id="thumb-container" className="thumb-container">
-							<ThumbList thumb_setting={this.state.thumb_setting} />
+						<div id="mainContainer" ref={this.mainContainerRef} className="split-view horizontal">
+							<div ref={this.dirRef} id="dir-list-container" className="dir-list-container">
+								<DirList   />
+							</div>
+							<div id="gutter" className="gutter"></div>
+							<div ref={this.gridRef} id="thumb-container" className="thumb-container">
+								<ThumbList thumb_setting={this.state.thumb_setting} />
+							</div>
+						
 						</div>
-					</div>
 				</div>
 			</ThemeProvider>
 		);
