@@ -19,13 +19,16 @@ class ThumbList extends React.Component {
 			dirData: props.dirData,
 			width:0,
 			height:0,
-			header_height:0,
-			percentage: 30,
 			tb :null ,
-			thumb_setting:this.props.thumb_setting
+			thumb_setting:props.thumb_setting
 		};
 	}
-
+	shouldComponentUpdate(nextProps, nextState) {
+		if (window.SplitView && window.SplitView.inDrag) {
+			return false;
+		}
+		return true;
+	}
 	async componentDidMount() {
 		this.gridRef = document.getElementById("thumb-container");
 		const tb =  TauriBridge.getInstance();
@@ -38,9 +41,14 @@ class ThumbList extends React.Component {
 				return;
 			}
 			this.setState({ width: newSizeB });
-			console.log(newSizeA, newSizeB, percent ,'/', FGrid.clientWidth, FGrid.clientHeight);
+			// console.log(newSizeA, newSizeB, percent ,'/', FGrid.clientWidth, FGrid.clientHeight);
 		});
-
+		window.SplitView.setDragStartCallback( (e)=> {
+			const FGrid = document.getElementsByClassName("FGrid")[0];
+			if ( FGrid == null ) {
+				return;
+			}
+		});
 		
 	}
   	  	/**

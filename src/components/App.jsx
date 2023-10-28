@@ -7,9 +7,9 @@ import ThumbList from "@/components/ThumbList/ThumbList";
 import DirList from "@/components/DirList/DirList";
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 // import TauriBridge from "@/utils/TauriBridge";
-// import './SplitView.js';
+import '../public/src/SplitView.js';
 import "./App.css";
-
+import { appWindow } from "@tauri-apps/api/window";
 class App extends Component {
 	mainContainerRef = React.createRef();
 	constructor(props) {
@@ -22,7 +22,12 @@ class App extends Component {
 		this.gridRef = React.createRef();
 		this.dirRef = React.createRef(); 
 	}
-
+	shouldComponentUpdate(nextProps, nextState) {
+		if (window.SplitView && window.SplitView.inDrag) {
+			return false;
+		}
+		return true;
+	}
 	async componentDidMount() { 
 		console.log('App componentDidMount');
 		const tb = TauriBridge.getInstance(); 
@@ -38,11 +43,14 @@ class App extends Component {
 			thumb_setting:thumb_setting 
 		}));
 		window.addEventListener("resize", this.handleResize);
+		appWindow.listen("main", (event) => {
+			console.log(event);
+		});
 	}
 	componentDidUpdate() 
 	{
 		console.log('App componentDidUpdate');
-		if (this.state.init) {
+		if (this.state.init && window.SplitView == null) {
 			SplitView.activate(this.mainContainerRef.current);
 		}
 	}

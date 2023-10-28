@@ -1,6 +1,4 @@
-
-"use strict"
-
+"use client"
 ; (function () {
 	console.log('SplitView.js');
 	const HORIZONTAL = "horizontal"
@@ -71,8 +69,11 @@
 	}
   
 	function dragStartHandler(e) {
-		console.log('[dragStartHandler]', e)
-	
+		// console.log('[dragStartHandler]', e)
+		if ( typeof dragStartCallback === 'function' ) {
+			window.SplitView.inDrag = true;
+			dragStartCallback(e)
+		}
 		// Already dragging
 		if (dragContext) { return }
 	
@@ -130,7 +131,7 @@
 	}
   
 	function dragHandler(e) {
-		console.log('[dragHandler]', e)
+		// console.log('[dragHandler]', e)
 		e.preventDefault()
 	
 		const { splitView } = dragContext
@@ -157,7 +158,11 @@
 	}
   
 	function dragEndHandler(e) {
-		console.log('[dragEndHandler]', e)
+		if (typeof dragEndCallback === 'function') {
+			window.SplitView.inDrag = false;
+			dragEndCallback(e);
+		}
+		// console.log('[dragEndHandler]', e)
 		const { viewA, viewB } = dragContext.splitView
 	
 		window.removeEventListener("mousemove", dragHandler)
@@ -215,12 +220,21 @@
 			this.activate(viewA)
 			this.activate(viewB)
 		}
+		window.SplitView = SplitView;
+		window.SplitView.inDrag = false;
+		window.SplitView.setUserDefinedCallback = function(callback) {
+			userDefinedCallback = callback;
+		};
+		window.SplitView.setDragStartCallback = function(callback) {
+			dragStartCallback = callback;
+		};
+		window.SplitView.setDragEndCallback = function(callback) {
+			dragEndCallback = callback;
+		};
 	}
 	let userDefinedCallback = null;
-	
+	let dragStartCallback = null;
+	let dragEndCallback = null;
 	// export
-	window.SplitView = SplitView;
-	window.SplitView.setUserDefinedCallback = function(callback) {
-		userDefinedCallback = callback;
-  	};
+	
 })()

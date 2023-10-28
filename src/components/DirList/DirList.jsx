@@ -53,7 +53,7 @@ class DirList extends Component {
 	componentDidMount() {
 		this.gridRef = document.getElementById("dir-list-container");
 		
-		window.SplitView.setUserDefinedCallback( (newSizeA, newSizeB, percent) => {
+		window.SplitView && window.SplitView.setUserDefinedCallback( (newSizeA, newSizeB, percent) => {
 			const FGrid = document.getElementsByClassName("DList")[0];
 			if ( FGrid == null ) {
 				return;
