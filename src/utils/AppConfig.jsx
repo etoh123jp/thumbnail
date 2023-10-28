@@ -32,14 +32,12 @@ class AppConfig {
 	async load() {
 		await this.loadThemeSeeting();
 		await this.loadThumbnailSetting();
-		console.log('Config loaded:', this.configData);
 	}
 	async loadThemeSeeting() 
-	{
+	{ 
 		this.configData.theme = {};
 		await this.loadConfigFile("theme", 
 		{
-			theme:{
 				typography: {
 					fontSize: 12,
 					fontWeightLight: 300,
@@ -56,15 +54,12 @@ class AppConfig {
 					body1: { fontSize: 14 },
 					button: { textTransform: 'none' },
 				},
-			}
-			
 		  });
 	}
 	async loadThumbnailSetting() {
 		this.configData.thumbnail = {};
 		await this.loadConfigFile('thumbnail',
 		{
-			thumbnail: {
 				aspectRatioEnabled: true,
 				aspectRatio: 1,
 				rect : {
@@ -72,7 +67,6 @@ class AppConfig {
 					height: 240
 				},
 				min: 240,
-			}
 		});
 	}
 	// 設定ファイルを読み込む

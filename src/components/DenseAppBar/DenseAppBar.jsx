@@ -36,7 +36,8 @@ class DenseAppBar extends Component {
 			drives: [],
 			favoriteAnchor:null,
 			tb: null,
-			thumb_setting: null
+			thumb_setting: null,
+			thumb_settingPanelOpen:false
 		};
 		this.handleHeightChange = this.handleHeightChange.bind(this);
 	}
@@ -78,7 +79,6 @@ class DenseAppBar extends Component {
 		if (newValue < this.state.thumb_setting.min) {
 			newValue = this.state.thumb_setting.min;
 		}
-		const thumb_setting = this.state.thumb_setting;
 		this.setState(prevState => ({
 			thumb_setting: {
 				...this.state.thumb_setting,
@@ -88,11 +88,11 @@ class DenseAppBar extends Component {
 				}
 			}
 		}));
+		this.props.changeThumbSize(this.state.thumb_setting.rect);
 	};
 
 	// 高さを変更する
 	handleHeightChange = (event, newValue) => {
-		const { thumb_setting } = this.state;
 		this.setState(prevState => ({
 			thumb_setting: {
 			...prevState.thumb_setting,
@@ -102,8 +102,21 @@ class DenseAppBar extends Component {
 			}
 			}
 		}));
+		this.props.changeThumbSize(this.state.thumb_setting.rect);
+
 	};
-	  
+	handleClose = () => {
+		console.log("handleClose");
+		this.setState({ anchorEl: null });
+	};
+	handleMouseEnter = () => {
+		this.setState({ thumb_settingPanelOpen: true });
+	};
+	handleMouseLeave = () => {
+		console.log("handleMouseLeave");
+		this.setState({ thumb_settingPanelOpen: false });
+		this.handleClose();
+	};
 		// 現在のフォルダをお気に入りに追加または削除
 	addToOrRemoveFromFavorite = () => {
 		const currentFolder = this.state.tb.getCurrentFolder(); // 現在のフォルダ名を取得
@@ -170,7 +183,7 @@ class DenseAppBar extends Component {
 			selectedDrive = matchingDrive.drive;
 		}
 		return (
-		<div className="root" shadow = 'none'>
+		<div className="root" shadow = 'none'  onMouseLeave={this.handleMouseLeave}>
 			<AppBar position="static" shadow = 'none'>
 			<Toolbar variant="dense" shadow = 'none' sx={{ minHeight: 32, maxHeight: 42, }}>
 			<DriveSelect
@@ -212,7 +225,7 @@ class DenseAppBar extends Component {
 						favorites={favorites}
 						handleDelete={this.handleDeleteFavorite}  // 削除処理のメソッドを渡す
 					/>
-			
+					{/* アスペクト比設定メニュー */}
 					<IconButton  color="inherit" onClick={this.handleClick}>
 						<PhotoSizeSelectLargeIcon />
 					</IconButton>
@@ -220,10 +233,13 @@ class DenseAppBar extends Component {
 						anchorEl={anchorEl}
 						keepMounted
 						open={Boolean(anchorEl)}
-						
 						onClose={this.handleClose}
+						
 					>
-							<MenuItem style={{ width: '300px' }}>
+							<MenuItem style={{ width: '300px' }}
+							onMouseEnter={this.handleMouseEnter}
+							onMouseLeave={this.handleMouseLeave}
+							>
 								<Box display="flex" flexDirection="column" alignItems="left" style={{ width: '100%' , fontSize:'medium'}}>
 								<Box display="flex" flexDirection="row" alignItems="center" style={{ width: '100%' , fontSize:'medium'}}>
 									<Typography gutterBottom>アスペクト比</Typography>

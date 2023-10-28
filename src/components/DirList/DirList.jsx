@@ -23,7 +23,6 @@ class DirList extends Component {
 		this.state = {
 			path: props.path,
 			dirData: props.dirData,
-			tumb_rect : {with : 0, height : 0},
 			width:0,
 			height:0,
 			header_height:0,
@@ -65,7 +64,7 @@ class DirList extends Component {
 		
 	}
 	shouldComponentUpdate(nextProps, nextState,) {
-		if ( this.props.path !== nextState.path) { 
+		if ( nextState.path != undefined && this.props.path !== nextState.path) { 
 			console.log("shouldComponentUpdate path:" + this.props.path + " -> " + nextState.path);
 	
 			return true;

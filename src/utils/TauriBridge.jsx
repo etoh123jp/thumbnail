@@ -87,7 +87,10 @@ class TauriBridge {
 	 * @return {type} The value of the thumbnail setting.
 	 */
 	getThumbnailSetting() {
-		return this.config.configData.thumbnail.thumbnail;
+		return this.config.configData.thumbnail;
+	}
+	setThumbSetting(thumb_setting) {
+		this.config.configData.thumbnail = thumb_setting;
 	}
 	// #region Page
 	/**

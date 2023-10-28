@@ -12,7 +12,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import "./App.css";
 
 class App extends Component {
-	
+	mainContainerRef = React.createRef();
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -20,9 +20,8 @@ class App extends Component {
 			tb: null,
 			theme:null,
 		};
-		
 		this.gridRef = React.createRef();
-		this.dirRef = React.createRef();
+		this.dirRef = React.createRef(); 
 	}
 
 	async componentDidMount() { 
@@ -32,15 +31,16 @@ class App extends Component {
 		TauriBridge.getInstance().setApp(this);
 		TauriBridge.getInstance().getStorageDirectory();
 		const theme = tb.getTheme();
-
+		const thumb_setting	= tb.getThumbnailSetting();
 		this.setState(state=>({
 			tb: tb,
 			init:true,
-			theme:theme
+			theme:theme,
+			thumb_setting:thumb_setting 
 		}));
-		const mainContainer= document.getElementById("mainContainer");
-		if (mainContainer) {
-			SplitView.activate(document.getElementById("mainContainer"));
+		const contaier = this.mainContainerRef.current;
+		if (contaier) {
+			SplitView.activate(contaier);
 			window.addEventListener("resize", this.handleResize);
 		}
 		
@@ -49,7 +49,14 @@ class App extends Component {
 	 componentWillUnmount() {
 		window.removeEventListener("resize", this.handleResize);
 	} 
-
+	changeThumbSize = (size) => {
+		this.setState(prevState => ({
+			thumb_setting: {
+				...prevState.thumb_setting,
+				rect: size
+			}
+		}));
+	}
 	handleResize = () => {
 		this.setState({
 			windowSize: {
@@ -67,15 +74,15 @@ class App extends Component {
 			<ThemeProvider theme={theme}>
 				<div className="App">
 					<div id="header" className="header">
-						<DenseAppBar  />
+						<DenseAppBar changeThumbSize={this.changeThumbSize} />
 					</div>
-					<div id="mainContainer" className="split-view horizontal">
+					<div id="mainContainer" ref={this.mainContainerRef} className="split-view horizontal">
 						<div ref={this.dirRef} id="dir-list-container" className="dir-list-container">
 							<DirList   />
 						</div>
 						<div id="gutter" className="gutter"></div>
 						<div ref={this.gridRef} id="thumb-container" className="thumb-container">
-							<ThumbList />
+							<ThumbList thumb_setting={this.state.thumb_setting} />
 						</div>
 					</div>
 				</div>

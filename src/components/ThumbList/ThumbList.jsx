@@ -22,7 +22,7 @@ class ThumbList extends React.Component {
 			header_height:0,
 			percentage: 30,
 			tb :null ,
-			thumb_setting:{}
+			thumb_setting:this.props.thumb_setting
 		};
 	}
 
@@ -30,8 +30,7 @@ class ThumbList extends React.Component {
 		this.gridRef = document.getElementById("thumb-container");
 		const tb =  TauriBridge.getInstance();
 		tb.setGrid(this);
-		const thumb_setting =  tb.getThumbnailSetting();
-		this.setState({ thumb_setting: thumb_setting, tb:tb });
+		this.setState({  tb:tb });
 		
 		window.SplitView.setUserDefinedCallback( (newSizeA, newSizeB, percent) => {
 			const FGrid = document.getElementsByClassName("FGrid")[0];
@@ -62,7 +61,7 @@ class ThumbList extends React.Component {
 		const gutter = document.getElementById("gutter");
 		const width = gridRef.clientWidth;
 		const height = gutter.clientHeight ;	
-		const thumb_setting = this.state.tb.getThumbnailSetting();
+		const thumb_setting = this.props.thumb_setting;
 
 		const tumb_rect = thumb_setting.rect;
 		const columnCount = Math.floor( width / tumb_rect.width) || 1;
